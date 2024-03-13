@@ -1,0 +1,25 @@
+{
+    "name": "hexlet/code",
+    "type": "project",
+    "license": "mit",
+    "autoload": {
+        "psr-4": {
+            "Hexlet\\Code\\": "src/"
+        },
+        "files": [
+            "vendor/docopt/docopt/src/docopt.php"
+        ]
+    },
+    "bin": [
+        "bin/gendiff"
+    ],
+    "authors": [
+        {
+            "name": "Anatoliy Yushkevich"
+        }
+    ],
+    "minimum-stability": "alpha",
+    "require": {
+        "docopt/docopt": "^1.0"
+    }
+}
