@@ -1,4 +1,4 @@
 
 /vendor/
-./first.json
-./second.json
+tests/fixtures/first.json
+tests/fixtures/second.json

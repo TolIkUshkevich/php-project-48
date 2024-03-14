@@ -9,7 +9,8 @@
         "files": [
             "vendor/docopt/docopt/src/docopt.php",
             "src/FindDiffFunction.php",
-            "src/JsonFunctions.php"
+            "src/JsonFunctions.php",
+            "vendor/phpunit/phpunit/src/Framework/TestCase.php"
         ]
     },
     "bin": [
@@ -27,6 +28,7 @@
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "*",
-        "phpstan/phpstan": "^1.10"
+        "phpstan/phpstan": "^1.10",
+        "phpunit/phpunit": "^11.0"
     }
 }
