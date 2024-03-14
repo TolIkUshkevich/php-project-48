@@ -1,7 +1,9 @@
 #!/usr/bin/env php
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . "/../src/autoload.php";
+
+use function App\FindDiff\genDiff;
 
 $doc = <<<DOC
 Generate diff
@@ -19,3 +21,7 @@ DOC;
 
 
 $args = Docopt::handle($doc);
+
+$firstPath = $args['<firstFile>'];
+$secondPath = $args['<secondFile>'];
+var_dump(genDiff($firstPath, $secondPath));
