@@ -23,5 +23,6 @@ jobs:
         with:
           hexlet-id: ${{ secrets.HEXLET_ID }}
 
+      - run: composer update
       - run: make install
       - run: make test
