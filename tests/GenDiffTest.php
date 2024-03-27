@@ -19,8 +19,8 @@ class GenDiffTest extends TestCase
   + verbose: 1
   - zzz: true
 }';
-        $actual = gendiff(__DIR__ . '/fixtures/first.json',
-            '/Users/yushkevichv/PhpstormProjects/php-project-48/tests/fixtures/second.json');
+        $actual = gendiff('tests/fixtures/first.json',
+            '/Users/user/projects/php-project-48/tests/fixtures/second.json');
         $this->assertEquals($expected, $actual);
     }
 }
