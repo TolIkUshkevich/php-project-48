@@ -20,7 +20,7 @@ class GenDiffTest extends TestCase
   - zzz: true
 }';
         $actual = gendiff('tests/fixtures/first.json',
-            '/Users/user/projects/php-project-48/tests/fixtures/second.json');
+            __DIR__ . '/fixtures/second.json');
         $this->assertEquals($expected, $actual);
     }
 }
