@@ -11,6 +11,7 @@ function genDiff(string $firstPath, string $secondPath): string
 {
     $firstFile = file_get_contents($firstPath, true);
     $secondFile = file_get_contents($secondPath, true);
+    var_dump($secondPath);
     $firstJsonData = json_decode($firstFile, true);
     $secondJsonData = json_decode($secondFile, true);
     $result = jsonMerge($firstJsonData, $secondJsonData);
