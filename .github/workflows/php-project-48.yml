@@ -23,7 +23,7 @@ jobs:
           JACOCO_SOURCE_PATH: app/src/main/java
         with:
         coverageCommand: make test-coverage-text
-        coverageLocations:${{github.workspace}}/app/build/reports/jacoco/test/jacocoTestReport.xm1:jacoco
+        # coverageLocations:${{github.workspace}}/app/build/reports/jacoco/test/jacocoTestReport.xm1:jacoco
 
       - run: composer install
       - run: make test
