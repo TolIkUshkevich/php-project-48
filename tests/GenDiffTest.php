@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\GendiffTest;
+
 require_once __DIR__ . '/autoload.php';
 
 use PHPUnit\Framework\TestCase;
@@ -9,7 +11,7 @@ class GenDiffTest extends TestCase
 {
     public function testGendiff(): void
     {
-        $expected ='{
+        $expected = '{
   + aaa: huq
   - follow: false
     host: hexlet.io
@@ -19,8 +21,13 @@ class GenDiffTest extends TestCase
   + verbose: 1
   - zzz: true
 }';
-        $actual = gendiff('tests/fixtures/first.json',
-            'tests/fixtures/second.json');
-        $this->assertEquals($expected, $actual);
+        $actual = gendiff(
+            'tests/fixtures/first.json',
+            'tests/fixtures/second.json'
+        );
+        $this->assertEquals(
+            $expected,
+            $actual
+        );
     }
 }

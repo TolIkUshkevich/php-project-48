@@ -3,19 +3,19 @@
 namespace App\JsonFunctions;
 
 /**
- * @param array<mixed> $firstJsonData
- * @param array<mixed> $secondJsonData
- * @return array<mixed> $result
+ * @param array<mixed>$firstJsonData
+ * @param array<mixed>$secondJsonData
+ * @return array<mixed>$result
  */
 function jsonMerge(array $firstJsonData, array $secondJsonData): array
 {
     $result = [];
-    foreach ($firstJsonData as $key => $value){
+    foreach ($firstJsonData as $key => $value) {
         if (is_bool($value)) {
             $value = $value ? 'true' : 'false';
         }
-        if (array_key_exists($key, $secondJsonData)){
-            if ($value === $secondJsonData[$key]){
+        if (array_key_exists($key, $secondJsonData)) {
+            if ($value === $secondJsonData[$key]) {
                 $result[$key] = $value;
                 unset($secondJsonData[$key]);
                 continue;
@@ -27,7 +27,7 @@ function jsonMerge(array $firstJsonData, array $secondJsonData): array
         $result[$key] = $value;
         unset($secondJsonData[$key]);
     }
-    foreach ($secondJsonData as $key => $value){
+    foreach ($secondJsonData as $key => $value) {
         $result[$key] = $value;
     }
     ksort($result);
@@ -36,15 +36,15 @@ function jsonMerge(array $firstJsonData, array $secondJsonData): array
 
 /**
  * @param array<mixed>$json
- * @param array<mixed> $firstJsonData
- * @param array<mixed> $secondJsonData
+ * @param array<mixed>$firstJsonData
+ * @param array<mixed>$secondJsonData
  * @return string $result
  */
-function jsonToString(array $json, array $firstJsonData, array $secondJsonData): string
+function jsonToFormatString(array $json, array $firstJsonData, array $secondJsonData): string
 {
     $result = "{\n";
-    foreach ($json as $key => $value){
-        if (is_array($value)){
+    foreach ($json as $key => $value) {
+        if (is_array($value)) {
             $result .= "  - {$key}: $value[0]\n  + {$key}: {$value[1]}\n";
             continue;
         }

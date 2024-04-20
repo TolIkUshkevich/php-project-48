@@ -29,6 +29,7 @@
     "require-dev": {
         "squizlabs/php_codesniffer": "*",
         "phpstan/phpstan": "^1.10",
-        "phpunit/phpunit": "^11.0"
+        "phpunit/phpunit": "^11.0",
+        "codeclimate/php-test-reporter": "^0.4.1"
     }
 }

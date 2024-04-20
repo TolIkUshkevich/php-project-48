@@ -28,4 +28,4 @@ $args = Docopt::handle($doc);
 
 $firstPath = $args['<firstFile>'];
 $secondPath = $args['<secondFile>'];
-echo genDiff($firstPath, $secondPath);
+var_dump(genDiff($firstPath, $secondPath));
