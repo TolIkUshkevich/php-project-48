@@ -17,7 +17,7 @@ jobs:
         with:
           php-version: '8.2'
       - name: Publish code coverage
-        uses: paambaati/codeclimate-action@v3.0.o
+        uses: paambaati/codeclimate-action@v3.0.0
         env:
           CC_TEST_REPORTER_ID: ${{secrets. CC_TEST_REPORTER_ID}}
           JACOCO_SOURCE_PATH: app/src/main/java
