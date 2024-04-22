@@ -16,15 +16,6 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-      - name: Publish code coverage
-        uses: paambaati/codeclimate-action@v3.0.0
-        env:
-          CC_TEST_REPORTER_ID: ${{secrets. CC_TEST_REPORTER_ID}}
-          JACOCO_SOURCE_PATH: app/src/main/java
-        with:
-            coverageCommand: make test-coverage-text
-            coverageLocations: ${{github.workspace}}/app/build/reports/jacoco/test/jacocoTestReport.xm1:jacoco
-
       - run: composer install
       - run: make test
       - run: make lint
