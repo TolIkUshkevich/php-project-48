@@ -1,19 +1,29 @@
 <?php
 
-namespace App\JsonFunctions;
+namespace App\DataProcessing;
+
+function arrayBoolValuesSort($array) {
+    foreach ($array as $key => $value){
+        if (is_bool($value)) {
+            $newValue = $value ? 'true' : 'false';
+            $array[$key] = $newValue;
+        }
+    }
+    return $array;
+}
 
 /**
  * @param array<mixed>$firstJsonData
  * @param array<mixed>$secondJsonData
  * @return array<mixed>$result
  */
-function jsonMerge(array $firstJsonData, array $secondJsonData): array
+function dataMerge(array $firstJsonData, array $secondJsonData): array
 {
     $result = [];
+    $firstJsonData = arrayBoolValuesSort($firstJsonData);
+    $secondJsonData = arrayBoolValuesSort($secondJsonData);
+    
     foreach ($firstJsonData as $key => $value) {
-        if (is_bool($value)) {
-            $value = $value ? 'true' : 'false';
-        }
         if (array_key_exists($key, $secondJsonData)) {
             if ($value === $secondJsonData[$key]) {
                 $result[$key] = $value;
@@ -40,7 +50,7 @@ function jsonMerge(array $firstJsonData, array $secondJsonData): array
  * @param array<mixed>$secondJsonData
  * @return string $result
  */
-function jsonToFormatString(array $json, array $firstJsonData, array $secondJsonData): string
+function formatingData(array $json, array $firstJsonData, array $secondJsonData): string
 {
     $result = "{\n";
     foreach ($json as $key => $value) {
