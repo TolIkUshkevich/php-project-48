@@ -4,7 +4,7 @@ namespace Parsers\JsonParser;
 
 /**
  * @param string $filepath
- * @return array 
+ * @return array
  */
 function parseJsonFile(string $filePath): array
 {

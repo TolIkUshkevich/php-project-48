@@ -2,8 +2,13 @@
 
 namespace App\DataProcessing;
 
-function arrayBoolValuesSort($array) {
-    foreach ($array as $key => $value){
+/**
+ * @param array<mixed>$array
+ * @return array<mixed>$array
+ */
+function arrayBoolValuesSort(array $array): array
+{
+    foreach ($array as $key => $value) {
         if (is_bool($value)) {
             $newValue = $value ? 'true' : 'false';
             $array[$key] = $newValue;
@@ -22,7 +27,7 @@ function dataMerge(array $firstJsonData, array $secondJsonData): array
     $result = [];
     $firstJsonData = arrayBoolValuesSort($firstJsonData);
     $secondJsonData = arrayBoolValuesSort($secondJsonData);
-    
+
     foreach ($firstJsonData as $key => $value) {
         if (array_key_exists($key, $secondJsonData)) {
             if ($value === $secondJsonData[$key]) {

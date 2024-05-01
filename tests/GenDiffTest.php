@@ -18,12 +18,30 @@ class GenDiffTest extends TestCase
   - proxy: 123.234.53.22
   - timeout: 50
   + timeout: 20
-  + verbose: 1
+  + verbose: true
   - zzz: true
 }';
         $actual = gendiff(
             'tests/fixtures/first.json',
-            'tests/fixtures/second.json'
+            '/Users/tolya/projects/php-project-48/tests/fixtures/second.json'
+        );
+        $this->assertEquals(
+            $expected,
+            $actual
+        );
+
+        $expected = '{
+  + aaa: huq
+  - addition: asd
+  + host: hexlet.io
+  - name: nvidia
+  + timeout: 20
+  - tytle: 4080
+  + verbose: true
+}';
+        $actual = gendiff(
+            './tests/fixtures/first.yml',
+            './tests/fixtures/second.json'
         );
         $this->assertEquals(
             $expected,

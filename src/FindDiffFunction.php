@@ -16,16 +16,18 @@ use function App\DataProcessing\formatingData;
  */
 function genDiff(string $firstPath, string $secondPath): string
 {
-    foreach ([$firstPath, $secondPath] as $path) {
-        if (preg_match('/\w+\.json/', $path)) {
-            $firstFileData = parseJsonFile($firstPath);
-            $secondFileData = parseJsonFile($secondPath);
-            }
-        elseif (preg_match('/\w+\.yml/', $path) or preg_match('/\w+\.yaml/', $path)) {
-            $firstFileData = parseYamlFile($firstPath);
-            $secondFileData = parseYamlFile($secondPath);
-            }
-        }
+    if (preg_match('/\w+\.json/', $firstPath)) {
+        $firstFileData = parseJsonFile($firstPath);
+    }
+    elseif (preg_match('/\w+\.yml/', $firstPath) or preg_match('/\w+\.yaml/', $firstPath)) {
+        $firstFileData = parseYamlFile($firstPath);
+    }
+    if (preg_match('/\w+\.json/', $secondPath)) {
+        $secondFileData = parseJsonFile($secondPath);
+    }
+    elseif (preg_match('/\w+\.yml/', $secondPath) or preg_match('/\w+\.yaml/', $secondPath)) {
+        $secondFileData = parseYamlFile($secondPath);
+    }
     $result = dataMerge($firstFileData, $secondFileData);
     $result = formatingData($result, $firstFileData, $secondFileData);
     return $result;
