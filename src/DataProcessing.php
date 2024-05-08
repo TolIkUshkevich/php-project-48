@@ -74,6 +74,7 @@ function dataMerge(array $firstJsonData, array $secondJsonData, int $deipth = 1)
         $acc[$key] = ['value' => $value, 'status' => $status, 'deipth' => $deipth];
         return $acc;
     });
+    ksort($result);
     return $result;
 }
 
@@ -85,34 +86,22 @@ function dataMerge(array $firstJsonData, array $secondJsonData, int $deipth = 1)
  */
 function formatingData(array $data, array $firstJsonData = null, array $secondJsonData = null): string
 {
-    // $result = "{\n";
-    // foreach ($json as $key => $value) {
-    //     if (is_array($value)) {
-    //         $result .= "  - {$key}: $value[0]\n  + {$key}: {$value[1]}\n";
-    //         continue;
-    //     }
-    //     switch ([array_key_exists($key, $firstJsonData), array_key_exists($key, $secondJsonData)]) {
-    //         case [true, true]:
-    //             $result .= "    {$key}: {$value}\n";
-    //             break;
-    //         case [true, false]:
-    //             $result .= "  - {$key}: {$value}\n";
-    //             break;
-    //         case [false, true]:
-    //             $result .= "  + {$key}: {$value}\n";
-    //     }
-    // }
-    $result = array_reduce(array_keys($data), function ($acc, $key) use ($data) {
+    // var_dump($data);
+    $result = "{\n";
+    $result .= array_reduce(array_keys($data), function ($acc, $key) use ($data) {
+        var_dump($key);
         $value = $data[$key];
+        var_dump($value);
         switch ($value['status']):
             case 3:
-                return "{$key}: {$value['value']}\n";
+                $acc .= "  {$key}: {$value['value']}\n";
                 break;
             case 2:
                 $firstValue = $value['value'][array_key_first($value['value'])];
                 $secondValue = $value['value'][array_key_last($value['value'])];
                 if (is_array($firstValue) and is_array($secondValue)){
                     $acc .= formatingData($value['value']);
+                    // var_dump($acc);
                 } else {
                     $acc .= "- {$key}: {$firstValue}\n+ {$key}: {$secondValue}\n";
                 }
@@ -121,11 +110,13 @@ function formatingData(array $data, array $firstJsonData = null, array $secondJs
                 $acc .= "- {$key}: {$value['value']}\n";
                 break;
             case 0:
+                var_dump($key);
                 $acc .= "+ {$key}: {$value['value']}\n";
                 break;
         endswitch;
         return $acc;
-    }, "{\n");
-    $result .= "}";
+    });
+    $result .= "}\n";
+    // var_dump($result);
     return $result;
 }

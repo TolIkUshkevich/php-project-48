@@ -1,13 +1,13 @@
 {
-  "asd": {
-    "1": 1,
-    "2": {
-      "3": 3
-    }
-  },
   "timeout": 20,
   "verbose": true,
   "host": "hexlet.io",
   "aaa": "huq",
-  "zzz": 123
+  "asd": {
+    "first": 1,
+    "second": {
+      "third": 3
+    }
+  },
+  "zzz": true
 }
