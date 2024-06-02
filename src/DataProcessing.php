@@ -34,20 +34,30 @@ function arrayBoolValuesSort(array $array): array
     return $resultArray;
 }
 
+function findKey($key, $data){
+    $result = array_reduce(array_keys($data), function($acc, $value) use ($key){
+        if (is_array($value)){
+            $acc = findKey($key, $value);
+        } else {
+            $acc = $key === $value;
+        }
+        return $acc;
+    });
+    return $result;
+}
+
 function getValueStatus($key, $firstData, $secondData)
 {
-    switch ([array_key_exists($key, $firstData), array_key_exists($key, $secondData)]):
+    switch ([findKey($key, $firstData), findKey($key, $secondData)]):
         case [true, true]:
             if ($firstData[$key] === $secondData[$key]){
-                return 3;
-            } elseif (is_array($firstData[$key]) or is_array($secondData[$key])){
-                return 4;
+                return "equals";
             }
-            return 2;
+            return "replaced";
         case [true, false]:
-            return 1;
+            return "deleted";
         case [false, true]:
-            return 0;
+            return "added";
         endswitch;
 }
 
@@ -55,17 +65,17 @@ function getValueByKey ($key, $firstData, $secondData = null){
     return $secondData === null ? $firstData[$key] : [$firstData[$key], $secondData[$key]];
 }
 
-function setParams(mixed $data, int $status, $deipth = 1){
+function setParams(mixed $data, string $status, $deipth){
     if (!is_array($data)){
-        $result = ['value' => $data, 'status' => $status, 'deipth' => $deipth];
+        $result = ['status' => $status, 'deipth' => $deipth, 'value' => $data];
         return $result;
     }
     $result = array_reduce(array_keys($data), function ($acc, $key) use ($data, $status, $deipth){
         $value = $data[$key];
         if (is_array($value)){
-            $acc[$key] = ['value' => setParams($value, $status, $deipth+1), 'status' => $status, 'deipth' => $deipth];
+            $acc[$key] = ['status' => $status, 'deipth' => $deipth, 'value' => setParams($value, $status, $deipth++)];
         } else {
-            $acc[$key] = ['value' => $value, 'status' => $status, 'deipth' => $deipth];
+            $acc[$key] = ['status' => $status, 'deipth' => $deipth, 'value' => $value];
         }
         return $acc;
     });
@@ -82,48 +92,47 @@ function dataMerge(array $firstJsonData, array $secondJsonData, int $deipth = 1)
     $result = [];
     $firstJsonData = arrayBoolValuesSort($firstJsonData);
     $secondJsonData = arrayBoolValuesSort($secondJsonData);
+    $keys = array_unique(array_merge(array_keys($firstJsonData), array_keys($secondJsonData)));
 
-    $result = array_reduce(array_unique(array_merge(array_keys($firstJsonData), array_keys($secondJsonData))), function ($acc, $key) use ($firstJsonData, $secondJsonData, $deipth) {
+    $result = array_reduce($keys, function ($acc, $key) use ($firstJsonData, $secondJsonData, $deipth) {
+        var_dump($key, $deipth);
         $status = getValueStatus($key, $firstJsonData, $secondJsonData);
-        $value = 1;
         switch ($status):
-            case 4:
-                
-            case 3:
+            case "equals":
                 $value = getValueByKey($key, $firstJsonData);
                 if (is_array($value)){
-                    $value = setParams($value, 3, $deipth++);
+                    $value = setParams($value, "equals", $deipth++);
                 } else {
                     $value = $value;
                 }
                 break;
-            case 2:
+            case "replaced":
                 $firstValue = getValueByKey($key, $firstJsonData);
                 $secondValue = getValueByKey($key, $secondJsonData);
                 if (is_array($firstValue) and is_array($secondValue)){
-                    $value = dataMerge($firstValue, $secondValue, $deipth+1);
+                    $value = dataMerge($firstValue, $secondValue, $deipth++);
                 } elseif (is_array($firstValue) or is_array($secondValue)){
-                    $value = [setParams($firstValue, 1), setParams($secondValue, 0)];
+                    $value = [setParams($firstValue, "deleted", $deipth++), setParams($secondValue, "added", $deipth++)];
                 } else {
                     $value = [$firstValue, $secondValue];
                 }
                 break;
-            case 1:
+            case "deleted":
                 if (is_array(getValueByKey($key, $firstJsonData))){
-                    $value = setParams(getValueByKey($key, $firstJsonData), 3, $deipth++);
+                    $value = setParams(getValueByKey($key, $firstJsonData), "equals", $deipth++);
                 } else {
                     $value = getValueByKey($key, $firstJsonData);
                 }
                 break;
-            case 0:
+            case "added":
                 if (is_array(getValueByKey($key, $secondJsonData))){
-                    $value = setParams(getValueByKey($key, $secondJsonData), 3, $deipth++);
+                    $value = setParams(getValueByKey($key, $secondJsonData), "equals", $deipth++);
                 } else {
                     $value = getValueByKey($key, $secondJsonData);
                 }
                 break;
             endswitch;
-        $acc[$key] = ['value' => $value, 'status' => $status, 'deipth' => $deipth];
+        $acc[$key] = ['status' => $status, 'deipth' => $deipth, 'value' => $value];
         return $acc;
     }); 
     ksort($result);
@@ -142,11 +151,11 @@ function formatingData(array $data): string
     $result .= array_reduce(array_keys($data), function ($acc, $key) use ($data) {
         $value = $data[$key];
         // print_r($value['deipth']);
-        // $deipth = $value['deipth'];
-        $deipth = 1;
+        $deipth = $value['deipth'];
+        // $deipth = 1;
 
-        // if ($value['status'] === null){
-        //     var_dump($key);
+        // if ($key === 'data'){
+        //     var_dump($value);
         //     die;
         // }
         switch ($value['status']):
@@ -164,7 +173,6 @@ function formatingData(array $data): string
                 if (is_array($firstValue) or is_array($secondValue)){
                     $acc .= $key;
                     $acc .= formatingData($value['value']);
-                    // var_dump($acc);
                 } else {
                     $string = str_repeat("  ", $deipth);
                     $acc .= "{$string}- {$key}: {$firstValue}\n{$string}+ {$key}: {$secondValue}\n";
@@ -173,18 +181,20 @@ function formatingData(array $data): string
             case 1:
                 $string = str_repeat("  ", $deipth);
                 if (is_array($value['value'])){
-                    $acc .= formatingData($value['value']);
+                    $currentValue = formatingData($value['value']);
+                    $acc .= "{$string}- {$key}: {$currentValue}\n";
                 } else{
                     $acc .= "{$string}- {$key}: {$value['value']}\n";
                 }
                 break;
             case 0:
-                $currentValue = $value['value'];
-                if (is_array($currentValue)){
-                    $acc .= formatingData($value['value']);
+                $string = str_repeat("  ", $deipth);
+                if (is_array($value['value'])){
+                    $currentValue = formatingData($value['value']);
+                    $acc .= "{$string}- {$key}: {$currentValue}\n";
                 } else { 
                     $string = str_repeat("  ", $deipth);
-                    $acc .= "{$string}+ {$key}: {$currentValue}\n";
+                    $acc .= "{$string}+ {$key}: {$value['value']}\n";
                 }
                 break;
         endswitch;
