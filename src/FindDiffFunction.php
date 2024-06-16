@@ -27,8 +27,8 @@ function genDiff(string $firstPath, string $secondPath): string
         $secondFileData = parseYamlFile($secondPath);
     }
     $result = dataMerge($firstFileData, $secondFileData);
-    print_r($result);
-    die;
+    // print_r($result);
+    // die;
     $result = formatingData($result);
     return $result;
 }

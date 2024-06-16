@@ -2,6 +2,8 @@
 
 namespace App\DataProcessing;
 
+use PhpParser\Node\Expr\Cast\Array_;
+
 /**
  * @param array<mixed>$array
  * @return array<mixed>$array
@@ -10,10 +12,7 @@ function arrayBoolValuesSort(array $array): array
 {
     $resultArray = array_reduce(array_keys($array), function ($acc, $key) use ($array){
         $value = $array[$key];
-        if (is_array($value)){
-            $acc[$key] = arrayBoolValuesSort($value);
-        }
-        if (is_bool($value) or $value === null) {
+        if (is_bool($value)) {
             switch ($value):
                 case true:
                     $newValue = 'true';
@@ -21,10 +20,9 @@ function arrayBoolValuesSort(array $array): array
                 case false:
                     $newValue = 'false';
                     break;
-                case null:
-                    $newValue = 'null';
-                    break;
                 endswitch;
+        } elseif ($value === null){
+            $newValue = 'null';
         } else {
             $newValue = $value;
         }
@@ -35,15 +33,7 @@ function arrayBoolValuesSort(array $array): array
 }
 
 function findKey($key, $data){
-    $result = array_reduce(array_keys($data), function($acc, $value) use ($key){
-        if (is_array($value)){
-            $acc = findKey($key, $value);
-        } else {
-            $acc = $key === $value;
-        }
-        return $acc;
-    });
-    return $result;
+    return in_array($key, array_keys($data));
 }
 
 function getValueStatus($key, $firstData, $secondData)
@@ -59,6 +49,8 @@ function getValueStatus($key, $firstData, $secondData)
         case [false, true]:
             return "added";
         endswitch;
+        var_dump($key, $secondData);
+        die;
 }
 
 function getValueByKey ($key, $firstData, $secondData = null){
@@ -95,7 +87,6 @@ function dataMerge(array $firstJsonData, array $secondJsonData, int $deipth = 1)
     $keys = array_unique(array_merge(array_keys($firstJsonData), array_keys($secondJsonData)));
 
     $result = array_reduce($keys, function ($acc, $key) use ($firstJsonData, $secondJsonData, $deipth) {
-        // var_dump($key, $deipth);
         $status = getValueStatus($key, $firstJsonData, $secondJsonData);
         switch ($status):
             case "equals":
@@ -109,10 +100,13 @@ function dataMerge(array $firstJsonData, array $secondJsonData, int $deipth = 1)
                 $secondValue = getValueByKey($key, $secondJsonData);
                 if (is_array($firstValue) and is_array($secondValue)){
                     $value = dataMerge($firstValue, $secondValue, $deipth+1);
-                } elseif (is_array($firstValue) or is_array($secondValue)){
-                    $value = [setParams($firstValue, "deleted", $deipth+1), setParams($secondValue, "added", $deipth+1)];
+                    $status = "equals";
+                } elseif (is_array($firstValue)){
+                    $value = ['array' => setParams($firstValue, "equals", $deipth+1), 'value' => setParams($secondValue, "added", $deipth+1)];
+                } elseif (is_array($secondValue)){
+                    $value = ['value' => setParams($firstValue, "deleted", $deipth+1), 'array' => setParams($secondValue, "equals", $deipth+1)];
                 } else {
-                    $value = [$firstValue, $secondValue];
+                    $value = ['value1' => $firstValue, 'value2' => $secondValue];
                 }
                 break;
             case "deleted":
@@ -143,53 +137,72 @@ function dataMerge(array $firstJsonData, array $secondJsonData, int $deipth = 1)
  * @param array<mixed>$secondJsonData
  * @return string $result
  */
-function formatingData(array $data): string
+function formatingData(array $data, int $deipth = 1): string
 {
     $result = "";
+    $stapleString = str_repeat("    ", $deipth-1);
     $result .= array_reduce(array_keys($data), function ($acc, $key) use ($data) {
         $value = $data[$key];
-        $deipth = $value['deipth'];
-        $string = str_repeat("    ", $deipth);
+        if ($value == ''){
+            var_dump($key, $value);
+            die;
+        }
+        $afterKeyString = $value == '' ? '' : ' ';
+        $deipthOfElement = $value['deipth'];
+        $string = str_repeat("    ", $deipthOfElement);
         switch ($value['status']):
             case "equals":
                 if (is_array($value['value'])){
-                    $acc .= "{$string}{$key}:";
-                    $acc .= formatingData($value['value']);
+                    $acc .= "\n{$string}{$key}:{$afterKeyString}";
+                    $acc .= formatingData($value['value'], $deipthOfElement+1);
                 } else {
-                    $acc .= "{$string}{$key}: {$value['value']}\n";
+                    $acc .= "\n{$string}{$key}:{$afterKeyString}{$value['value']}";
                 }
                 break;
             case "replaced":
                 $stringForReplacedStatus = substr($string, 0, -2);
                 $firstValue = $value['value'][array_key_first($value['value'])];
                 $secondValue = $value['value'][array_key_last($value['value'])];
-                if (is_array($firstValue) or is_array($secondValue)){
-                    $acc .= "{$string}{$key}: ";
-                    $acc .= formatingData($value['value']);
-                } else {
-                    $acc .= "{$stringForReplacedStatus}- {$key}: {$firstValue}\n{$stringForReplacedStatus}+ {$key}: {$secondValue}\n";
-                }
+                $afterKeyFirstString = $firstValue == '' ? '' : ' ';
+                $afterKeySecondString = $secondValue == '' ? '' : ' ';
+                // var_dump($firstValue, $secondValue);
+                // die;
+                switch (array_keys($value['value'])):
+                case ['array', 'value']:
+                    $acc .= "\n{$stringForReplacedStatus}- {$key}:{$afterKeyFirstString}";
+                    $acc .= formatingData($firstValue, $deipthOfElement+1);
+                    $acc .= "\n{$stringForReplacedStatus}+ {$key}:{$afterKeySecondString}{$secondValue['value']}";
+                    break;
+                case ['value', 'array']:
+                    $acc .= "\n{$stringForReplacedStatus}- {$key}:{$afterKeyFirstString}{$firstValue['value']}";
+                    $acc .= "\n{$stringForReplacedStatus}+ {$key}:{$afterKeySecondString}";
+                    $acc .= formatingData($secondValue, $deipthOfElement+1);
+                    break;
+                case ['value1', 'value2']:
+                    $acc .= "\n{$stringForReplacedStatus}- {$key}:{$afterKeyFirstString}{$firstValue}\n{$stringForReplacedStatus}+ {$key}:{$afterKeySecondString}{$secondValue}";
+                    break;
+                endswitch;
                 break;
             case "deleted":
                 $stringForDeletedStatus = substr($string, 0, -2);
                 if (is_array($value['value'])){
-                    $currentValue = formatingData($value['value']);
-                    $acc .= "{$stringForDeletedStatus}- {$key}: {$currentValue}\n";
+                    $currentValue = formatingData($value['value'], $deipthOfElement+1);
+                    $acc .= "\n{$stringForDeletedStatus}- {$key}:{$afterKeyString}{$currentValue}";
                 } else{
-                    $acc .= "{$stringForDeletedStatus}- {$key}: {$value['value']}\n";
+                    $acc .= "\n{$stringForDeletedStatus}- {$key}:{$afterKeyString}{$value['value']}";
                 }
                 break;
             case "added":
                 $stringForAddedStatus = substr($string, 0, -2);
                 if (is_array($value['value'])){
-                    $currentValue = formatingData($value['value']);
-                    $acc .= "{$stringForAddedStatus}+ {$key}: {$currentValue}\n";
+                    $currentValue = formatingData($value['value'], $deipthOfElement+1);
+                    $acc .= "\n{$stringForAddedStatus}+ {$key}:{$afterKeyString}{$currentValue}";
                 } else { 
-                    $acc .= "{$stringForAddedStatus}+ {$key}: {$value['value']}\n";
+                    $acc .= "\n{$stringForAddedStatus}+ {$key}:{$afterKeyString}{$value['value']}";
                 }
                 break;
         endswitch;
         return $acc;
     });
-    return "{\n{$result}\n}";
+    return "{{$result}\n{$stapleString}}";
 }
