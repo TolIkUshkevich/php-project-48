@@ -12,7 +12,8 @@
             "src/DataProcessing.php",
             "vendor/phpunit/phpunit/src/Framework/TestCase.php",
             "parsers/JsonParser.php",
-            "parsers/YamlParser.php"
+            "parsers/YamlParser.php",
+            "src/Formaters.php"
         ]
     },
     "bin": [

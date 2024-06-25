@@ -7,14 +7,15 @@ require_once __DIR__ . "/autoload.php";
 use function Parsers\JsonParser\parseJsonFile;
 use function Parsers\YamlParser\parseYamlFile;
 use function App\DataProcessing\dataMerge;
-use function App\DataProcessing\formatingData;
+use function App\Formaters\defaultFormating;
+use function App\Formaters\plainFormating;
 
 /**
  * @param  string $firstPath
  * @param  string $secondPath
  * @return string
  */
-function genDiff(string $firstPath, string $secondPath): string
+function genDiff(string $firstPath, string $secondPath, string $format): string
 {
     if (preg_match('/\w+\.json/', $firstPath)) {
         $firstFileData = parseJsonFile($firstPath);
@@ -27,8 +28,10 @@ function genDiff(string $firstPath, string $secondPath): string
         $secondFileData = parseYamlFile($secondPath);
     }
     $result = dataMerge($firstFileData, $secondFileData);
-    // print_r($result);
-    // die;
-    $result = formatingData($result);
+    if ($format === 'stylish') {
+        $result = defaultFormating($result);
+    } elseif ($format === 'plain') {
+        $result = plainFormating($result);
+    }
     return $result;
 }
