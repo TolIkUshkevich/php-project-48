@@ -15,7 +15,7 @@ use function App\Formaters\plainFormating;
  * @param  string $secondPath
  * @return string
  */
-function genDiff(string $firstPath, string $secondPath, string $format): string
+function genDiff(string $firstPath, string $secondPath, string $format = 'stylish'): string
 {
     if (preg_match('/\w+\.json/', $firstPath)) {
         $firstFileData = parseJsonFile($firstPath);
@@ -27,11 +27,15 @@ function genDiff(string $firstPath, string $secondPath, string $format): string
     } elseif (preg_match('/\w+\.yml/', $secondPath) or preg_match('/\w+\.yaml/', $secondPath)) {
         $secondFileData = parseYamlFile($secondPath);
     }
-    $result = dataMerge($firstFileData, $secondFileData);
     if ($format === 'stylish') {
+        $result = dataMerge($firstFileData, $secondFileData);
         $result = defaultFormating($result);
     } elseif ($format === 'plain') {
+        $result = dataMerge($firstFileData, $secondFileData);
         $result = plainFormating($result);
+    } elseif ($format === 'json') {
+        $result = array_merge($firstFileData, $secondFileData);
+        $result = json_encode($result);
     }
     return $result;
 }

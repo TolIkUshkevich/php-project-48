@@ -67,9 +67,19 @@ function setParams(mixed $data, string $status, int $deipth, array $path): array
         $value = $data[$key];
         $newPath = [...$path, $key];
         if (is_array($value)) {
-            $acc[$key] = ['status' => $status, 'deipth' => $deipth, 'path' => $newPath, 'value' => setParams($value, $status, $deipth + 1, $newPath)];
+            $acc[$key] = [
+                'status' => $status,
+                'deipth' => $deipth,
+                'path' => $newPath,
+                'value' => setParams($value, $status, $deipth + 1, $newPath)
+            ];
         } else {
-            $acc[$key] = ['status' => $status, 'deipth' => $deipth, 'path' => $newPath, 'value' => $value];
+            $acc[$key] = [
+                'status' => $status,
+                'deipth' => $deipth,
+                'path' => $newPath,
+                'value' => $value
+            ];
         }
         return $acc;
     });
@@ -105,11 +115,20 @@ function dataMerge(array $firstJsonData, array $secondJsonData, int $deipth = 1,
                     $value = dataMerge($firstValue, $secondValue, $deipth + 1, $newPath);
                     $status = "equals";
                 } elseif (is_array($firstValue)) {
-                    $value = ['array' => setParams($firstValue, "equals", $deipth + 1, $newPath), 'value' => setParams($secondValue, "added", $deipth + 1, $newPath)];
+                    $value = [
+                        'array' => setParams($firstValue, "equals", $deipth + 1, $newPath),
+                        'value' => setParams($secondValue, "added", $deipth + 1, $newPath)
+                    ];
                 } elseif (is_array($secondValue)) {
-                    $value = ['value' => setParams($firstValue, "deleted", $deipth + 1, $newPath), 'array' => setParams($secondValue, "equals", $deipth + 1, $newPath)];
+                    $value = [
+                        'value' => setParams($firstValue, "deleted", $deipth + 1, $newPath),
+                        'array' => setParams($secondValue, "equals", $deipth + 1, $newPath)
+                    ];
                 } else {
-                    $value = ['value1' => $firstValue, 'value2' => $secondValue];
+                    $value = [
+                        'value1' => $firstValue,
+                        'value2' => $secondValue
+                    ];
                 }
                 break;
             case "deleted":
@@ -127,7 +146,12 @@ function dataMerge(array $firstJsonData, array $secondJsonData, int $deipth = 1,
                 }
                 break;
         endswitch;
-        $acc[$key] = ['status' => $status, 'deipth' => $deipth, 'path' => $newPath, 'value' => $value];
+        $acc[$key] = [
+            'status' => $status,
+            'deipth' => $deipth,
+            'path' => $newPath,
+            'value' => $value
+        ];
         return $acc;
     });
     ksort($result);

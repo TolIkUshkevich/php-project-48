@@ -12,6 +12,7 @@ function valueFormation(mixed $value): string
         }
         return sprintf("'%s'", $value);
     }
+    return $value;
 }
 
 function defaultFormating(array $data, int $deipth = 1): string
