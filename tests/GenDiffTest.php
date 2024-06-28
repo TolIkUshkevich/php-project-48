@@ -5,7 +5,7 @@ namespace Tests\GendiffTest;
 require_once __DIR__ . '/autoload.php';
 
 use PHPUnit\Framework\TestCase;
-use function App\Finddiff\gendiff;
+use function Differ\Differ\FindDiff\gendiff;
 
 class GenDiffTest extends TestCase
 {

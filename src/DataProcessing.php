@@ -1,8 +1,6 @@
 <?php
 
-namespace App\DataProcessing;
-
-use PhpParser\Node\Expr\Cast\Array_;
+namespace Differ\Differ\DataProcessing;
 
 /**
  * @param array<mixed>$array

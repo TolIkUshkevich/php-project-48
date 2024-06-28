@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Formaters;
+namespace Differ\Differ\Formaters;
 
 function valueFormation(mixed $value): string
 {

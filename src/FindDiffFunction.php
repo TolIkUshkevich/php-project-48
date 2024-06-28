@@ -1,14 +1,14 @@
 <?php
 
-namespace App\FindDiff;
+namespace Differ\Differ\FindDiff;
 
 require_once __DIR__ . "/autoload.php";
 
 use function Parsers\JsonParser\parseJsonFile;
 use function Parsers\YamlParser\parseYamlFile;
-use function App\DataProcessing\dataMerge;
-use function App\Formaters\defaultFormating;
-use function App\Formaters\plainFormating;
+use function Differ\Differ\DataProcessing\dataMerge;
+use function Differ\Differ\Formaters\defaultFormating;
+use function Differ\Differ\Formaters\plainFormating;
 
 /**
  * @param  string $firstPath
