@@ -114,11 +114,11 @@ Property 'group3' was added with value: [complex value]";
   + tytle: 1040
 }";
 
-    $actual4 = gendiff(
-        'tests/fixtures/first.yml',
-        '/Users/user/projects/php-project-48/tests/fixtures/second.yaml'
-    );
+        $actual4 = gendiff(
+            'tests/fixtures/first.yml',
+            '/Users/user/projects/php-project-48/tests/fixtures/second.yaml'
+        );
 
-    $this->assertEquals($expected4, $actual4);
+        $this->assertEquals($expected4, $actual4);
     }
 }
