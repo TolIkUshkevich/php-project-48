@@ -1,6 +1,6 @@
 <?php
 
-namespace Differ\Differ\FindDiff;
+namespace Differ\Differ;
 
 require_once __DIR__ . "/autoload.php";
 

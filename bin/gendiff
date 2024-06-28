@@ -7,7 +7,7 @@ if (file_exists(__DIR__ . '/../../../autoload.php')) {
   require_once __DIR__ . '/../vendor/autoload.php';
 }
 
-use function Differ\Differ\FindDiff\genDiff;
+use function Differ\Differ\genDiff;
 
 $doc = <<<DOC
 Generate diff
