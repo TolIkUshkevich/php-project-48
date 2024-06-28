@@ -24,7 +24,7 @@ class GenDiffTest extends TestCase
         }
         setting6: {
             doge: {
-              - wow:
+              - wow: 
               + wow: so much
             }
             key: value

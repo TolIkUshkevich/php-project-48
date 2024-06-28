@@ -22,7 +22,7 @@ function defaultFormating(array $data, int $deipth = 1): string
     $result .= array_reduce(array_keys($data), function ($acc, $key) use ($data) {
         $properties = $data[$key];
         $value = $properties['value'];
-        $afterKeyString = $value == '' ? '' : ' ';
+        $afterKeyString = ' ';
         $deipthOfElement = $properties['deipth'];
         $status = $properties['status'];
         $string = str_repeat("    ", $deipthOfElement);
@@ -39,8 +39,8 @@ function defaultFormating(array $data, int $deipth = 1): string
                 $stringForReplacedStatus = substr($string, 0, -2);
                 $firstValue = $value[array_key_first($value)];
                 $secondValue = $value[array_key_last($value)];
-                $afterKeyFirstString = $firstValue == '' ? '' : ' ';
-                $afterKeySecondString = $secondValue == '' ? '' : ' ';
+                $afterKeyFirstString = ' ';
+                $afterKeySecondString = ' ';
                 switch (array_keys($value)) :
                     case ['array', 'value']:
                         $acc .= "\n{$stringForReplacedStatus}- {$key}:{$afterKeyFirstString}";
