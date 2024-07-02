@@ -32,7 +32,7 @@
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "*",
-        "phpstan/phpstan": "^1.10",
+        "phpstan/phpstan": "^1.11",
         "phpunit/phpunit": "^11.0",
         "codeclimate/php-test-reporter": "^0.4.1"
     }

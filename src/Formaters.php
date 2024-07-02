@@ -2,7 +2,7 @@
 
 namespace Differ\Differ\Formaters;
 
-function valueFormation(mixed $value): string
+function valueFormation(mixed $value): mixed
 {
     if (is_array($value)) {
         return '[complex value]';
@@ -15,7 +15,7 @@ function valueFormation(mixed $value): string
     return $value;
 }
 
-function defaultFormating(array $data, int $deipth = 1): string
+function defaultFormating(mixed $data, int $deipth = 1): string
 {
     $stapleString = str_repeat("    ", $deipth - 1);
     $result = "";

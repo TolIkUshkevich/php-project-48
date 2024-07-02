@@ -3,8 +3,8 @@
 namespace Parsers\JsonParser;
 
 /**
- * @param string $filepath
- * @return array
+ * @param string $filePath
+ * @return array<mixed>
  */
 function parseJsonFile(string $filePath): array
 {

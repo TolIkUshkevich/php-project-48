@@ -17,6 +17,9 @@ use function Differ\Differ\Formaters\plainFormating;
  */
 function genDiff(string $firstPath, string $secondPath, string $format = 'stylish'): string
 {
+    $firstFileData = [];
+    $secondFileData = [];
+    $result = null;
     if (preg_match('/\w+\.json/', $firstPath)) {
         $firstFileData = parseJsonFile($firstPath);
     } elseif (preg_match('/\w+\.yml/', $firstPath) or preg_match('/\w+\.yaml/', $firstPath)) {

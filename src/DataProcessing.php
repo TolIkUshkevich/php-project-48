@@ -30,31 +30,56 @@ function arrayBoolValuesSort(array $array): array
     return $resultArray;
 }
 
-function findKey($key, $data): bool
+/**
+ * @param string$key
+ * @param array<mixed> $data
+ * @return bool
+ */
+function findKey(string $key, array $data): bool
 {
     return in_array($key, array_keys($data));
 }
 
-function getValueStatus($key, $firstData, $secondData)
+/**
+ * @param string$key
+ * @param array<mixed>$firstData
+ * @param array<mixed>$secondData
+ * @return string
+ */
+function getValueStatus(string $key, array $firstData, array $secondData): string
 {
+    $resultStatus = "";
     switch ([findKey($key, $firstData), findKey($key, $secondData)]) :
         case [true, true]:
             if ($firstData[$key] === $secondData[$key]) {
-                return "equals";
+                $resultStatus = "equals";
             }
-            return "replaced";
+            $resultStatus = "replaced";
         case [true, false]:
-            return "deleted";
+            $resultStatus = "deleted";
         case [false, true]:
-            return "added";
+            $resultStatus = "added";
     endswitch;
+    return $resultStatus;
 }
 
-function getValueByKey($key, $firstData, $secondData = null)
+/**
+ * @param string$key
+ * @param array<mixed>$firstData
+ * @param array<mixed>$secondData
+ * @return mixed
+ */
+function getValueByKey(string $key, array $firstData, array $secondData = null): mixed
 {
     return $secondData === null ? $firstData[$key] : [$firstData[$key], $secondData[$key]];
 }
-
+/**
+ * @param mixed$data
+ * @param string$status
+ * @param int$deipth
+ * @param array<mixed>$path
+ * @return array<mixed>
+ */
 function setParams(mixed $data, string $status, int $deipth, array $path): array
 {
     if (!is_array($data)) {
@@ -87,9 +112,11 @@ function setParams(mixed $data, string $status, int $deipth, array $path): array
 /**
  * @param array<mixed>$firstJsonData
  * @param array<mixed>$secondJsonData
+ * @param int$deipth
+ * @param array<string>$path
  * @return array<mixed>$result
  */
-function dataMerge(array $firstJsonData, array $secondJsonData, int $deipth = 1, $path = []): array
+function dataMerge(array $firstJsonData, array $secondJsonData, int $deipth = 1, array $path = []): array
 {
     $result = [];
     $firstJsonData = arrayBoolValuesSort($firstJsonData);
@@ -99,6 +126,7 @@ function dataMerge(array $firstJsonData, array $secondJsonData, int $deipth = 1,
     $result = array_reduce($keys, function ($acc, $key) use ($firstJsonData, $secondJsonData, $deipth, $path) {
         $newPath = [...$path, $key];
         $status = getValueStatus($key, $firstJsonData, $secondJsonData);
+        $value = '';
         switch ($status) :
             case "equals":
                 $value = getValueByKey($key, $firstJsonData);
