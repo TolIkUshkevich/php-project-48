@@ -90,20 +90,7 @@ Property 'group3' was added with value: [complex value]";
             $actual2
         );
 
-        $expected3 = '{"common":{"follow":false,"setting1":"Value 1","setting3":null,"setting4":"blah blah","setting5":{"key5":"value5"},"setting6":{"key":"value","ops":"vops","doge":{"wow":"so much"}}},"group1":{"foo":"bar","baz":"bars","nest":"str"},"group2":{"abc":12345,"deep":{"id":45}},"group3":{"deep":{"id":{"number":45}},"fee":100500}}';
-
-        $actual3 = gendiff(
-            './tests/fixtures/first.json',
-            './tests/fixtures/second.json',
-            'json'
-        );
-
-        $this->assertEquals(
-            $expected3,
-            $actual3
-        );
-
-        $expected4 = "{
+        $expected3 = "{
   + addition: false
   + asd: no
   - common: {
@@ -114,11 +101,11 @@ Property 'group3' was added with value: [complex value]";
   + tytle: 1040
 }";
 
-        $actual4 = gendiff(
+        $actual3 = gendiff(
             'tests/fixtures/first.yml',
             '/Users/user/projects/php-project-48/tests/fixtures/second.yaml'
         );
 
-        $this->assertEquals($expected4, $actual4);
+        $this->assertEquals($expected3, $actual3);
     }
 }

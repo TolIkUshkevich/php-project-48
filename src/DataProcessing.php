@@ -2,6 +2,8 @@
 
 namespace Differ\Differ\DataProcessing;
 
+use function Functional\sort;
+
 /**
  * @param array<mixed>$array
  * @return array<mixed>$array
@@ -53,12 +55,16 @@ function getValueStatus(string $key, array $firstData, array $secondData): strin
         case [true, true]:
             if ($firstData[$key] === $secondData[$key]) {
                 $resultStatus = "equals";
+                break;
             }
             $resultStatus = "replaced";
+            break;
         case [true, false]:
             $resultStatus = "deleted";
+            break;
         case [false, true]:
             $resultStatus = "added";
+            break;
     endswitch;
     return $resultStatus;
 }

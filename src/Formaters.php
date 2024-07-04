@@ -98,6 +98,8 @@ function plainFormating(mixed $data, bool $recursively = false): string
                 break;
             case 'replaced':
                 $resultPath = implode('.', $path);
+                $firstValue = "";
+                $secondValue = "";
                 switch (array_keys($value)) :
                     case ['value1', 'value2']:
                         $firstValue = valueFormation($value[array_key_first($value)]);

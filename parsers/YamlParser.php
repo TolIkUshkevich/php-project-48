@@ -10,5 +10,5 @@ use Symfony\Component\Yaml\Yaml;
  */
 function parseYamlFile(string $filePath): array
 {
-    return Yaml::parse(file_get_contents($filePath));
+    return Yaml::parse((string)file_get_contents($filePath));
 }

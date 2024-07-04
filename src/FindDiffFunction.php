@@ -15,7 +15,7 @@ use function Differ\Differ\Formaters\plainFormating;
  * @param  string $secondPath
  * @return string
  */
-function genDiff(string $firstPath, string $secondPath, string $format = 'stylish'): string
+function genDiff(string $firstPath, string $secondPath, string $format = 'stylish'): string|null|false
 {
     $firstFileData = [];
     $secondFileData = [];
@@ -32,6 +32,8 @@ function genDiff(string $firstPath, string $secondPath, string $format = 'stylis
     }
     if ($format === 'stylish') {
         $result = dataMerge($firstFileData, $secondFileData);
+        // print_r($result);
+        // die;
         $result = defaultFormating($result);
     } elseif ($format === 'plain') {
         $result = dataMerge($firstFileData, $secondFileData);
