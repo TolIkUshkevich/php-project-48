@@ -39,7 +39,7 @@ function arrayBoolValuesSort(array $array): array
  */
 function findKey(string $key, array $data): bool
 {
-    return in_array($key, array_keys($data));
+    return in_array($key, array_keys($data), true);
 }
 
 /**
@@ -50,7 +50,7 @@ function findKey(string $key, array $data): bool
  */
 function getValueStatus(string $key, array $firstData, array $secondData): string
 {
-    $resultStatus = "";
+    // $resultStatus = "";
     switch ([findKey($key, $firstData), findKey($key, $secondData)]) :
         case [true, true]:
             if ($firstData[$key] === $secondData[$key]) {
