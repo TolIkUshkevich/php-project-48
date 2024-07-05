@@ -58,7 +58,7 @@ class GenDiffTest extends TestCase
 
         $actual = gendiff(
             './tests/fixtures/first.json',
-            '/Users/user/projects/php-project-48/tests/fixtures/second.json',
+            'tests/fixtures/second.json',
             'stylish'
         );
 
@@ -103,7 +103,7 @@ Property 'group3' was added with value: [complex value]";
 
         $actual3 = gendiff(
             'tests/fixtures/first.yml',
-            '/Users/user/projects/php-project-48/tests/fixtures/second.yaml'
+            'tests/fixtures/second.yaml'
         );
 
         $this->assertEquals($expected3, $actual3);
