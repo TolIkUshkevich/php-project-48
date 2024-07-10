@@ -50,7 +50,6 @@ function findKey(string $key, array $data): bool
  */
 function getValueStatus(string $key, array $firstData, array $secondData): string
 {
-    // $resultStatus = "";
     switch ([findKey($key, $firstData), findKey($key, $secondData)]) :
         case [true, true]:
             if ($firstData[$key] === $secondData[$key]) {
@@ -65,6 +64,8 @@ function getValueStatus(string $key, array $firstData, array $secondData): strin
         case [false, true]:
             $resultStatus = "added";
             break;
+        default:
+            $resultStatus = "added";
     endswitch;
     return $resultStatus;
 }
