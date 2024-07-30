@@ -138,20 +138,6 @@ function dataMerge(array $firstJsonData, array $secondJsonData, int $deipth = 1,
     $firstJsonData = arrayBoolValuesSort($firstJsonData);
     $secondJsonData = arrayBoolValuesSort($secondJsonData);
     $keys = array_unique(array_merge(array_keys($firstJsonData), array_keys($secondJsonData)));
-    $firstJsonData = sort($firstJsonData, function ($left, $right) use ($firstJsonData) {
-        $leftKey = key($firstJsonData);
-        next($firstJsonData);
-        $rightKey = key($firstJsonData);
-        return strcmp($leftKey, $rightKey);
-    }, true);
-    $secondJsonData = sort($secondJsonData, function ($left, $right) use ($secondJsonData) {
-        $leftKey = key($secondJsonData);
-        next($secondJsonData);
-        $rightKey = key($secondJsonData);
-        return strcmp($leftKey, $rightKey);
-    }, true);
-
-
     $result = array_reduce($keys, function ($acc, $key) use ($firstJsonData, $secondJsonData, $deipth, $path) {
         $newPath = [...$path, $key];
         $status = getValueStatus($key, $firstJsonData, $secondJsonData);
@@ -215,7 +201,7 @@ function dataMerge(array $firstJsonData, array $secondJsonData, int $deipth = 1,
         ];
         return $acc;
     });
-    $result = sort ($result, function($a, $b){
+    $result = sort($result, function ($a, $b) {
         if ($a['key'] == $b['key']) {
             return 0;
         }
