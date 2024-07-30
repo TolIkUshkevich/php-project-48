@@ -91,7 +91,7 @@ function getValueByKey(string $key, array $firstData, array $secondData = null):
  */
 function setParams(mixed $data, string $status, int $deipth, array $path, string $key = null): array
 {
-    if (!is_array($data)){
+    if (!is_array($data)) {
         return [
             'key' => $key,
             'status' => $status,
@@ -215,7 +215,7 @@ function dataMerge(array $firstJsonData, array $secondJsonData, int $deipth = 1,
         ];
         return $acc;
     });
-    $result = sort($result, function($a, $b){
+    $result = sort ($result, function($a, $b){
         if ($a['key'] == $b['key']) {
             return 0;
         }
