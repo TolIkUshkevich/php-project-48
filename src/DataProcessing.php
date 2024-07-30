@@ -2,6 +2,8 @@
 
 namespace Differ\Differ\DataProcessing;
 
+require_once __DIR__ . "/autoload.php";
+
 use function Functional\sort;
 
 /**
@@ -87,17 +89,23 @@ function getValueByKey(string $key, array $firstData, array $secondData = null):
  * @param array<mixed>$path
  * @return array<mixed>
  */
-function setParams(mixed $data, string $status, int $deipth, array $path): array
+function setParams(mixed $data, string $status, int $deipth, array $path, string $key = null): array
 {
-    if (!is_array($data)) {
-        $result = ['status' => $status, 'deipth' => $deipth, 'path' => $path, 'value' => $data];
-        return $result;
+    if (!is_array($data)){
+        return [
+            'key' => $key,
+            'status' => $status,
+            'deipth' => $deipth,
+            'path' => $path,
+            'value' => $data
+        ];
     }
     $result = array_reduce(array_keys($data), function ($acc, $key) use ($data, $status, $deipth, $path) {
         $value = $data[$key];
         $newPath = [...$path, $key];
         if (is_array($value)) {
-            $acc[$key] = [
+            $acc[] = [
+                'key' => $key,
                 'status' => $status,
                 'deipth' => $deipth,
                 'path' => $newPath,
@@ -105,6 +113,7 @@ function setParams(mixed $data, string $status, int $deipth, array $path): array
             ];
         } else {
             $acc[$key] = [
+                'key' => $key,
                 'status' => $status,
                 'deipth' => $deipth,
                 'path' => $newPath,
@@ -129,6 +138,19 @@ function dataMerge(array $firstJsonData, array $secondJsonData, int $deipth = 1,
     $firstJsonData = arrayBoolValuesSort($firstJsonData);
     $secondJsonData = arrayBoolValuesSort($secondJsonData);
     $keys = array_unique(array_merge(array_keys($firstJsonData), array_keys($secondJsonData)));
+    $firstJsonData = sort($firstJsonData, function ($left, $right) use ($firstJsonData) {
+        $leftKey = key($firstJsonData);
+        next($firstJsonData);
+        $rightKey = key($firstJsonData);
+        return strcmp($leftKey, $rightKey);
+    }, true);
+    $secondJsonData = sort($secondJsonData, function ($left, $right) use ($secondJsonData) {
+        $leftKey = key($secondJsonData);
+        next($secondJsonData);
+        $rightKey = key($secondJsonData);
+        return strcmp($leftKey, $rightKey);
+    }, true);
+
 
     $result = array_reduce($keys, function ($acc, $key) use ($firstJsonData, $secondJsonData, $deipth, $path) {
         $newPath = [...$path, $key];
@@ -144,17 +166,22 @@ function dataMerge(array $firstJsonData, array $secondJsonData, int $deipth = 1,
             case "replaced":
                 $firstValue = getValueByKey($key, $firstJsonData);
                 $secondValue = getValueByKey($key, $secondJsonData);
+                // if ($key === 'common'){
+                //     var_dump($firstValue) . "\n";
+                //     var_dump($secondValue) . "\n";
+                //     die;
+                // }
                 if (is_array($firstValue) and is_array($secondValue)) {
                     $value = dataMerge($firstValue, $secondValue, $deipth + 1, $newPath);
                     $status = "equals";
                 } elseif (is_array($firstValue)) {
                     $value = [
                         'array' => setParams($firstValue, "equals", $deipth + 1, $newPath),
-                        'value' => setParams($secondValue, "added", $deipth + 1, $newPath)
+                        'value' => setParams($secondValue, "added", $deipth + 1, $newPath, $key)
                     ];
                 } elseif (is_array($secondValue)) {
                     $value = [
-                        'value' => setParams($firstValue, "deleted", $deipth + 1, $newPath),
+                        'value' => setParams($firstValue, "deleted", $deipth + 1, $newPath, $key),
                         'array' => setParams($secondValue, "equals", $deipth + 1, $newPath)
                     ];
                 } else {
@@ -179,7 +206,8 @@ function dataMerge(array $firstJsonData, array $secondJsonData, int $deipth = 1,
                 }
                 break;
         endswitch;
-        $acc[$key] = [
+        $acc[] = [
+            'key' => $key,
             'status' => $status,
             'deipth' => $deipth,
             'path' => $newPath,
@@ -187,6 +215,11 @@ function dataMerge(array $firstJsonData, array $secondJsonData, int $deipth = 1,
         ];
         return $acc;
     });
-    ksort($result);
+    $result = sort($result, function($a, $b){
+        if ($a['key'] == $b['key']) {
+            return 0;
+        }
+        return ($a['key'] < $b['key']) ? -1 : 1;
+    });
     return $result;
 }

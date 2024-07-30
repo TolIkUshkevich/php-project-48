@@ -2,6 +2,8 @@
 
 namespace Differ\Differ\Formaters;
 
+use PHPUnit\Runner\Baseline\Writer;
+
 function valueFormation(mixed $value): mixed
 {
     if (is_array($value)) {
@@ -19,8 +21,9 @@ function defaultFormating(mixed $data, int $deipth = 1): string
 {
     $stapleString = str_repeat("    ", $deipth - 1);
     $result = "";
-    $result .= array_reduce(array_keys($data), function ($acc, $key) use ($data) {
-        $properties = $data[$key];
+    $result .= array_reduce(array_keys($data), function ($acc, $arrayKey) use ($data) {
+        $properties = $data[$arrayKey];
+        $key = $properties['key'];
         $value = $properties['value'];
         $afterKeyString = ' ';
         $deipthOfElement = $properties['deipth'];
