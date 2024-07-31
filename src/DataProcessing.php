@@ -102,23 +102,22 @@ function setParams(mixed $data, string $status, int $deipth, array $path, string
         $value = $data[$key];
         $newPath = [...$path, $key];
         if (is_array($value)) {
-            $acc[] = [
+            return array_merge($acc, [
                 'key' => $key,
                 'status' => $status,
                 'deipth' => $deipth,
                 'path' => $newPath,
                 'value' => setParams($value, $status, $deipth + 1, $newPath)
-            ];
+            ]);
         } else {
-            $acc[] = [
+            return array_merge($acc, [
                 'key' => $key,
                 'status' => $status,
                 'deipth' => $deipth,
                 'path' => $newPath,
                 'value' => $value
-            ];
+            ]);
         }
-        return $acc;
     });
     return $result;
 }
