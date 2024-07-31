@@ -12,7 +12,7 @@ use function Functional\sort;
  */
 function arrayBoolValuesSort(array $array): array
 {
-    $resultArray = array_reduce(array_keys($array), function ($acc, $key) use ($array) {
+    return array_reduce(array_keys($array), function ($acc, $key) use ($array) {
         $value = $array[$key];
         if (is_bool($value)) {
             switch ($value) :
@@ -28,10 +28,8 @@ function arrayBoolValuesSort(array $array): array
         } else {
             $newValue = $value;
         }
-        $acc[$key] = $newValue;
-        return $acc;
-    });
-    return $resultArray;
+        return array_merge($acc, [$key => $newValue]);
+    }, []);
 }
 
 /**
@@ -112,7 +110,7 @@ function setParams(mixed $data, string $status, int $deipth, array $path, string
                 'value' => setParams($value, $status, $deipth + 1, $newPath)
             ];
         } else {
-            $acc[$key] = [
+            $acc[] = [
                 'key' => $key,
                 'status' => $status,
                 'deipth' => $deipth,
