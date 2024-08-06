@@ -157,7 +157,7 @@ function plainFormating(array $data): string
                     return "\n" . "Property '{$value['path']}' was updated. From [complex value] to [complex value]";
                 }
             case 'no':
-                if (!$value['value']){
+                if (!$value['value']) {
                     var_dump($value);
                     echo 111111111;
                     die;
