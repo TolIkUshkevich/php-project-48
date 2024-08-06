@@ -2,9 +2,7 @@
 
 namespace Differ\Differ\DataProcessing;
 
-require_once __DIR__ . "/autoload.php";
-
-use function Functional\sort;
+use Functional;
 
 /**
  * @param array<mixed>$array
@@ -132,7 +130,7 @@ function setParams(mixed $data, string $status, int $deipth, array $path, string
 function dataMerge(array $firstJsonData, array $secondJsonData, int $deipth = 1, array $path = []): array
 {
     $keys = array_unique(array_merge(array_keys($firstJsonData), array_keys($secondJsonData)));
-    $sortKeys = sort($keys, fn($left, $right) => strcmp($left, $right));
+    $sortKeys = Functional\sort($keys, fn($left, $right) => strcmp($left, $right));
     return array_map(function ($key) use ($firstJsonData, $secondJsonData) {
         if (array_key_exists($key, $firstJsonData) and !array_key_exists($key, $secondJsonData)) {
             return ['key' => $key, 'status' => '-', 'value' => $firstJsonData[$key]];
