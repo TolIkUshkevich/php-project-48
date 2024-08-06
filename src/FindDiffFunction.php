@@ -43,4 +43,3 @@ function genDiff(string $firstPath, string $secondPath, string $format = 'stylis
     }
     return $result;
 }
-
