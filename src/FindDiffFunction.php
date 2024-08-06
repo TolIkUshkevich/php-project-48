@@ -21,16 +21,14 @@ function genDiff(string $firstPath, string $secondPath, string $format = 'stylis
         $firstFileData = parseJsonFile($firstPath);
     } elseif (boolval(preg_match('/\w+\.yml/', $firstPath)) or boolval(preg_match('/\w+\.yaml/', $firstPath))) {
         $firstFileData = parseYamlFile($firstPath);
-    }
-    else {
+    } else {
         $firstFileData = null;
     }
     if (boolval(preg_match('/\w+\.json/', $secondPath))) {
         $secondFileData = parseJsonFile($secondPath);
     } elseif (boolval(preg_match('/\w+\.yml/', $secondPath)) or boolval(preg_match('/\w+\.yaml/', $secondPath))) {
         $secondFileData = parseYamlFile($secondPath);
-    }
-    else {
+    } else {
         $secondFileData = null;
     }
     if ($format === 'stylish') {
