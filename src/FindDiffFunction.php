@@ -22,14 +22,14 @@ function genDiff(string $firstPath, string $secondPath, string $format = 'stylis
     } elseif (boolval(preg_match('/\w+\.yml/', $firstPath)) or boolval(preg_match('/\w+\.yaml/', $firstPath))) {
         $firstFileData = parseYamlFile($firstPath);
     } else {
-        $firstFileData = null;
+        $firstFileData = [];
     }
     if (boolval(preg_match('/\w+\.json/', $secondPath))) {
         $secondFileData = parseJsonFile($secondPath);
     } elseif (boolval(preg_match('/\w+\.yml/', $secondPath)) or boolval(preg_match('/\w+\.yaml/', $secondPath))) {
         $secondFileData = parseYamlFile($secondPath);
     } else {
-        $secondFileData = null;
+        $secondFileData = [];
     }
     if ($format === 'stylish') {
         $result = dataMerge($firstFileData, $secondFileData);
