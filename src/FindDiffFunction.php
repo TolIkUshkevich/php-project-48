@@ -40,6 +40,7 @@ function genDiff(string $firstPath, string $secondPath, string $format = 'stylis
     } elseif ($format === 'json') {
         $result = array_merge($firstFileData, $secondFileData);
         return json_encode($result);
+    } else {
+        return null;
     }
-    return $result;
 }
