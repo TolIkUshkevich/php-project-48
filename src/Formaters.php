@@ -17,122 +17,167 @@ function valueFormation(mixed $value): mixed
     return $value;
 }
 
-function defaultFormating(mixed $data, int $deipth = 1): string
+function defaultFormating(mixed $data, string $indent = ''): array
 {
-    $stapleString = str_repeat("    ", $deipth - 1);
-    $result = "";
-    $result .= array_reduce(array_keys($data), function ($acc, $arrayKey) use ($data) {
-        $properties = $data[$arrayKey];
-        $key = $properties['key'];
-        $value = $properties['value'];
-        $afterKeyString = ' ';
-        $deipthOfElement = $properties['deipth'];
-        $status = $properties['status'];
-        $string = str_repeat("    ", $deipthOfElement);
-        switch ($status) :
-            case "equals":
-                if (is_array($value)) {
-                    $acc .= "\n{$string}{$key}:{$afterKeyString}";
-                    $acc .= defaultFormating($value, $deipthOfElement + 1);
-                } else {
-                    $acc .= "\n{$string}{$key}:{$afterKeyString}{$value}";
+    $arrayStrings = array_map(function ($value) use ($indent) {
+        switch ($value['status']) {
+            case '+':
+            case '-':
+                if (is_array($value['value'])) {
+                    return printNonAnilizeArray($value['value'], $indent, $value['status'], $value['key']);
                 }
-                break;
-            case "replaced":
-                $stringForReplacedStatus = substr($string, 0, -2);
-                $firstValue = $value[array_key_first($value)];
-                $secondValue = $value[array_key_last($value)];
-                $afterKeyFirstString = ' ';
-                $afterKeySecondString = ' ';
-                switch (array_keys($value)) :
-                    case ['array', 'value']:
-                        $acc .= "\n{$stringForReplacedStatus}- {$key}:{$afterKeyFirstString}";
-                        $acc .= defaultFormating($firstValue, $deipthOfElement + 1);
-                        $acc .= "\n{$stringForReplacedStatus}+ {$key}:{$afterKeySecondString}{$secondValue['value']}";
-                        break;
-                    case ['value', 'array']:
-                        $acc .= "\n{$stringForReplacedStatus}- {$key}:{$afterKeyFirstString}{$firstValue['value']}";
-                        $acc .= "\n{$stringForReplacedStatus}+ {$key}:{$afterKeySecondString}";
-                        $acc .= defaultFormating($secondValue, $deipthOfElement + 1);
-                        break;
-                    case ['value1', 'value2']:
-                        $acc .= "\n{$stringForReplacedStatus}- {$key}:{$afterKeyFirstString}{$firstValue}
-{$stringForReplacedStatus}+ {$key}:{$afterKeySecondString}{$secondValue}";
-                        break;
-                endswitch;
-                break;
-            case "deleted":
-                $stringForDeletedStatus = substr($string, 0, -2);
-                if (is_array($value)) {
-                    $currentValue = defaultFormating($value, $deipthOfElement + 1);
-                    $acc .= "\n{$stringForDeletedStatus}- {$key}:{$afterKeyString}{$currentValue}";
-                } else {
-                    $acc .= "\n{$stringForDeletedStatus}- {$key}:{$afterKeyString}{$value}";
+                return printString($value['value'], $indent, $value['status'], $value['key']);
+            case 'no':
+            case 'both':
+                if (is_array($value['value'])) {
+                    return printArray($value['value'], $indent, ' ', $value['key']);
                 }
-                break;
-            case "added":
-                $stringForAddedStatus = substr($string, 0, -2);
-                if (is_array($value)) {
-                    $currentValue = defaultFormating($value, $deipthOfElement + 1);
-                    $acc .= "\n{$stringForAddedStatus}+ {$key}:{$afterKeyString}{$currentValue}";
+                return printString($value['value'], $indent, ' ', $value['key']);
+            case 'complex':
+                if (is_array($value['value']['old'])) {
+                    $param1 = printNonAnilizeArray($value['value']['old'], $indent, '-', $value['key']);
                 } else {
-                    $acc .= "\n{$stringForAddedStatus}+ {$key}:{$afterKeyString}{$value}";
+                    $param1 = printString($value['value']['old'], $indent, '-', $value['key']);
                 }
-                break;
-        endswitch;
-        return $acc;
-    });
-    return "{{$result}\n{$stapleString}}";
+                if (is_array($value['value']['new'])) {
+                    $param2 = printNonAnilizeArray($value['value']['new'], $indent, '+', $value['key']);
+                } else {
+                    $param2 = printString($value['value']['new'], $indent, '+', $value['key']);
+                }
+                return "$param1" . "$param2";
+        }
+    }, $data);
+    return $arrayStrings;
 }
 
-function plainFormating(mixed $data, bool $recursively = false): string
+function printNonAnilizeArray(array $value, string $indent, string $status, string $key): string
 {
-    $result = "";
-    $result = array_reduce(array_keys($data), function ($acc, $key) use ($data) {
-        $properties = $data[$key];
-        $status = $properties['status'];
-        $path = $properties['path'];
-        $value = $properties['value'];
-        switch ($status) :
-            case 'equals':
-                if (is_array($value)) {
-                    $acc[] = plainFormating($value, true);
+    return "\n" . "{$indent}  {$status} " . "{$key}: {" .
+        implode('', printArrayWithoutStatus($value, $indent .
+            str_repeat(' ', 4))) .
+        "\n" . $indent . str_repeat(' ', 4) . "}";
+}
+
+function printString(mixed $value, string $indent, string $status, string $key): string
+{
+    $arg = printSomeWord($value);
+    return "\n" . "$indent" . "  {$status} {$key}: {$arg}";
+}
+
+function printArray(array $value, string $indent, string $status, string $key): string
+{
+    return "\n" . "{$indent}  {$status} " . "{$key}: {" .
+        implode('', defaultFormating($value, $indent
+            . str_repeat(' ', 4))) .
+        "\n" . "$indent" . str_repeat(' ', 4) . "}";
+}
+
+function printArrayWithoutStatus(array $value, string $indent): array
+{
+    $result = array_map(function ($key, $value) use ($indent) {
+        if (!is_array($value)) {
+            $arg = printSomeWord($value);
+            return "\n" . "$indent" . "    {$key}: {$arg}";
+        } else {
+            return "\n" . "{$indent}    " . "{$key}: {" .
+                implode('', printArrayWithoutStatus($value, $indent .
+                    str_repeat(' ', 4))) .
+                "\n" . $indent . str_repeat(' ', 4) . "}";
+        }
+    }, array_keys($value), $value);
+    return $result;
+}
+
+function printSomeWord(mixed $str)
+{
+    if ($str === false) {
+        return 'false';
+    } elseif ($str === true) {
+        return 'true';
+    } elseif ($str === null) {
+        return 'null';
+    } else {
+        return $str;
+    }
+}
+
+function addPath(array $arr, string $postfix = ''): array
+{
+    $result = array_map(function ($value) use ($postfix) {
+        if (isset($value['key'])) {
+            if (is_array($value['value']) && $value['status'] !== 'complex') {
+                return
+                    [
+                        'key' => $value['key'],
+                        'status' => $value['status'],
+                        'path' => $postfix . $value['key'],
+                        'value' => addPath($value['value'], "{$postfix}{$value['key']}.")
+
+                    ];
+            } else {
+                return [
+                    'key' => $value['key'],
+                    'status' => $value['status'],
+                    'path' => $postfix . $value['key'],
+                    'value' => $value['value']
+                ];
+            }
+        } else {
+            return $value;
+        }
+    }, $arr);
+    return $result;
+}
+
+function plainFormating(array $data): string
+{
+    return implode('', array_map(function ($value) {
+        switch ($value['status']) {
+            case '+':
+                if (is_array($value['value'])) {
+                    return "\n" . "Property '{$value['path']}' was added with value: [complex value]";
+                } else {
+                    $item = printSomeWordForPlain($value['value']);
+                    return "\n" . "Property '{$value['path']}' was added with value: {$item}";
                 }
-                break;
-            case 'replaced':
-                $resultPath = implode('.', $path);
-                $firstValue = "";
-                $secondValue = "";
-                switch (array_keys($value)) :
-                    case ['value1', 'value2']:
-                        $firstValue = valueFormation($value[array_key_first($value)]);
-                        $secondValue = valueFormation($value[array_key_last($value)]);
-                        break;
-                    case ['array', 'value']:
-                        $firstValue = '[complex value]';
-                        $secondValue = valueFormation($value[array_key_last($value)]['value']);
-                        break;
-                    case ['value', 'array']:
-                        $firstValue = valueFormation($value[array_key_first($value)]['value']);
-                        $secondValue = '[complex value]';
-                        break;
-                    case ['array', 'array']:
-                        $firstValue = '[complex value]';
-                        $secondValue = '[complex value]';
-                        break;
-                endswitch;
-                $acc[] = "Property '{$resultPath}' was updated. From {$firstValue} to {$secondValue}";
-                break;
-            case 'deleted':
-                $resultPath = implode('.', $path);
-                $acc[] = "Property '{$resultPath}' was removed";
-                break;
-            case 'added':
-                $resultValue = valueFormation($value);
-                $resultPath = implode('.', $path);
-                $acc[] = "Property '{$resultPath}' was added with value: {$resultValue}";
-        endswitch;
-        return $acc;
-    });
-    return implode("\n", $result);
+            case '-':
+                return "\n" . "Property '{$value['path']}' was removed";
+            case 'complex':
+                if (!is_array($value['value']['old']) and !is_array($value['value']['new'])) {
+                    $itemNew = printSomeWordForPlain($value['value']['new']);
+                    $itemOld = printSomeWordForPlain($value['value']['old']);
+                    return "\n" . "Property '{$value['path']}' was updated. From {$itemOld} to {$itemNew}";
+                } elseif (is_array($value['value']['old']) and !is_array($value['value']['new'])) {
+                    $itemNew = printSomeWordForPlain($value['value']['new']);
+                    return "\n" . "Property '{$value['path']}' was updated. From [complex value] to {$itemNew}";
+                } elseif (!is_array($value['value']['old']) and is_array($value['value']['new'])) {
+                    $itemOld = printSomeWordForPlain($value['value']['old']);
+                    return "\n" . "Property '{$value['path']}' was updated. From {$itemOld} to [complex value]";
+                } else {
+                    return "\n" . "Property '{$value['path']}' was updated. From [complex value] to [complex value]";
+                }
+            case 'no':
+                if (!$value['value']){
+                    var_dump($value);
+                    echo 111111111;
+                    die;
+                }
+                return plainFormating($value['value']);
+        }
+    }, $data));
+}
+
+function printSomeWordForPlain(mixed $data)
+{
+    if ($data === false) {
+        return 'false';
+    } elseif ($data === true) {
+        return 'true';
+    } elseif ($data === null) {
+        return 'null';
+    } elseif ($data === 0) {
+        return '0';
+    } else {
+        return "'{$data}'";
+    }
 }

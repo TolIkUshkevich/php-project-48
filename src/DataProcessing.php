@@ -118,7 +118,7 @@ function setParams(mixed $data, string $status, int $deipth, array $path, string
                 'value' => $value
             ]);
         }
-    });
+    }, []);
     return $result;
 }
 
@@ -131,78 +131,21 @@ function setParams(mixed $data, string $status, int $deipth, array $path, string
  */
 function dataMerge(array $firstJsonData, array $secondJsonData, int $deipth = 1, array $path = []): array
 {
-    $result = [];
-    $firstJsonData = arrayBoolValuesSort($firstJsonData);
-    $secondJsonData = arrayBoolValuesSort($secondJsonData);
     $keys = array_unique(array_merge(array_keys($firstJsonData), array_keys($secondJsonData)));
-    $result = array_reduce($keys, function ($acc, $key) use ($firstJsonData, $secondJsonData, $deipth, $path) {
-        $newPath = [...$path, $key];
-        $status = getValueStatus($key, $firstJsonData, $secondJsonData);
-        $value = '';
-        switch ($status) :
-            case "equals":
-                $value = getValueByKey($key, $firstJsonData);
-                if (is_array($value)) {
-                    $value = setParams($value, "equals", $deipth + 1, $newPath);
-                }
-                break;
-            case "replaced":
-                $firstValue = getValueByKey($key, $firstJsonData);
-                $secondValue = getValueByKey($key, $secondJsonData);
-                // if ($key === 'common'){
-                //     var_dump($firstValue) . "\n";
-                //     var_dump($secondValue) . "\n";
-                //     die;
-                // }
-                if (is_array($firstValue) and is_array($secondValue)) {
-                    $value = dataMerge($firstValue, $secondValue, $deipth + 1, $newPath);
-                    $status = "equals";
-                } elseif (is_array($firstValue)) {
-                    $value = [
-                        'array' => setParams($firstValue, "equals", $deipth + 1, $newPath),
-                        'value' => setParams($secondValue, "added", $deipth + 1, $newPath, $key)
-                    ];
-                } elseif (is_array($secondValue)) {
-                    $value = [
-                        'value' => setParams($firstValue, "deleted", $deipth + 1, $newPath, $key),
-                        'array' => setParams($secondValue, "equals", $deipth + 1, $newPath)
-                    ];
-                } else {
-                    $value = [
-                        'value1' => $firstValue,
-                        'value2' => $secondValue
-                    ];
-                }
-                break;
-            case "deleted":
-                if (is_array(getValueByKey($key, $firstJsonData))) {
-                    $value = setParams(getValueByKey($key, $firstJsonData), "equals", $deipth + 1, $newPath);
-                } else {
-                    $value = getValueByKey($key, $firstJsonData);
-                }
-                break;
-            case "added":
-                if (is_array(getValueByKey($key, $secondJsonData))) {
-                    $value = setParams(getValueByKey($key, $secondJsonData), "equals", $deipth + 1, $newPath);
-                } else {
-                    $value = getValueByKey($key, $secondJsonData);
-                }
-                break;
-        endswitch;
-        $acc[] = [
-            'key' => $key,
-            'status' => $status,
-            'deipth' => $deipth,
-            'path' => $newPath,
-            'value' => $value
-        ];
-        return $acc;
-    });
-    $result = sort($result, function ($a, $b) {
-        if ($a['key'] == $b['key']) {
-            return 0;
+    $sortKeys = sort($keys, fn($left, $right) => strcmp($left, $right));
+    return array_map(function ($key) use ($firstJsonData, $secondJsonData) {
+        if (array_key_exists($key, $firstJsonData) and !array_key_exists($key, $secondJsonData)) {
+            return ['key' => $key, 'status' => '-', 'value' => $firstJsonData[$key]];
+        } elseif (!array_key_exists($key, $firstJsonData) and array_key_exists($key, $secondJsonData)) {
+            return ['key' => $key, 'status' => '+', 'value' => $secondJsonData[$key]];
+        } elseif (array_key_exists($key, $firstJsonData) and array_key_exists($key, $secondJsonData)) {
+            if (is_array($firstJsonData[$key]) and is_array($secondJsonData[$key])) {
+                return ['key' => $key, 'status' => 'no', 'value' => dataMerge($firstJsonData[$key], $secondJsonData[$key])];
+            } elseif ($firstJsonData[$key] === $secondJsonData[$key]) {
+                return ['key' => $key, 'status' => 'both', 'value' => $firstJsonData[$key]];
+            } else {
+                return ['key' => $key, 'status' => 'complex', 'value' => ['old' => $firstJsonData[$key], 'new' => $secondJsonData[$key]]];
+            }
         }
-        return ($a['key'] < $b['key']) ? -1 : 1;
-    });
-    return $result;
+    }, $sortKeys);
 }

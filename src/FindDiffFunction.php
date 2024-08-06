@@ -9,6 +9,7 @@ use function Parsers\YamlParser\parseYamlFile;
 use function Differ\Differ\DataProcessing\dataMerge;
 use function Differ\Differ\Formaters\defaultFormating;
 use function Differ\Differ\Formaters\plainFormating;
+use function Differ\Differ\Formaters\addPath;
 
 /**
  * @param  string $firstPath
@@ -34,10 +35,10 @@ function genDiff(string $firstPath, string $secondPath, string $format = 'stylis
         $result = dataMerge($firstFileData, $secondFileData);
         // print_r($result);
         // die;
-        $result = defaultFormating($result);
+        $result = "{" . implode('', defaultFormating($result)) ."\n" . "}";
     } elseif ($format === 'plain') {
         $result = dataMerge($firstFileData, $secondFileData);
-        $result = plainFormating($result);
+        $result = plainFormating(addPath($result));
     } elseif ($format === 'json') {
         $result = array_merge($firstFileData, $secondFileData);
         $result = json_encode($result);
