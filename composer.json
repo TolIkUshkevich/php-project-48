@@ -11,8 +11,8 @@
             "src/FindDiffFunction.php",
             "src/DataProcessing.php",
             "vendor/phpunit/phpunit/src/Framework/TestCase.php",
-            "parsers/JsonParser.php",
-            "parsers/YamlParser.php",
+            "src/JsonParser.php",
+            "src/YamlParser.php",
             "src/Formaters.php"
         ]
     },

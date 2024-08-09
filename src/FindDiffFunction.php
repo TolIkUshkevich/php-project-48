@@ -32,6 +32,8 @@ function genDiff(string $firstPath, string $secondPath, string $format = 'stylis
     }
     if ($format === 'stylish') {
         $result = dataMerge($firstFileData, $secondFileData);
+        // var_dump($result);
+        // die;
         return "{" . implode('', defaultFormating($result)) . "\n" . "}";
     } elseif ($format === 'plain') {
         $result = dataMerge($firstFileData, $secondFileData);

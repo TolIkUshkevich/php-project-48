@@ -1,0 +1,10 @@
+{
+  + addition: false
+  + asd: no
+  - common: {
+        asd: 1
+        lad: 2
+    }
+  + name: nvidia
+  + tytle: 1040
+}
