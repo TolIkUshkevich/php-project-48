@@ -15,9 +15,7 @@
             "parsers/YamlParser.php",
             "parsers/parseFile.php",
             "src/Formaters/stylishFormat.php",
-            "src/Formaters/plainFormat.php",
-            "src/Formaters.php"
-        ]
+            "src/Formaters/plainFormat.php"        ]
     },
     "bin": [
         "bin/gendiff"
