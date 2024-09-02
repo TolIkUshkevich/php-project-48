@@ -1,6 +1,9 @@
 install:
 	composer install
 
+load:
+	composer dump-autoload
+
 console:
 	composer exec --verbose psysh
 

@@ -2,12 +2,11 @@
 
 namespace Differ\Differ;
 
-use function Parsers\JsonParser\parseJsonFile;
-use function Parsers\YamlParser\parseYamlFile;
+use function Parsers\FileParser\defineFormatAndParseFile;
+use function Formaters\stylishFormater\defaultFormating;
+use function Formaters\plainFormater\plainFormating;
 use function Differ\Differ\DataProcessing\dataMerge;
-use function Differ\Differ\Formaters\defaultFormating;
-use function Differ\Differ\Formaters\plainFormating;
-use function Differ\Differ\Formaters\addPath;
+use function Formaters\plainFormater\addPath;
 
 /**
  * @param  string $firstPath
@@ -16,24 +15,10 @@ use function Differ\Differ\Formaters\addPath;
  */
 function genDiff(string $firstPath, string $secondPath, string $format = 'stylish'): string|null|false
 {
-    if (boolval(preg_match('/\w+\.json/', $firstPath))) {
-        $firstFileData = parseJsonFile($firstPath);
-    } elseif (boolval(preg_match('/\w+\.yml/', $firstPath)) or boolval(preg_match('/\w+\.yaml/', $firstPath))) {
-        $firstFileData = parseYamlFile($firstPath);
-    } else {
-        $firstFileData = [];
-    }
-    if (boolval(preg_match('/\w+\.json/', $secondPath))) {
-        $secondFileData = parseJsonFile($secondPath);
-    } elseif (boolval(preg_match('/\w+\.yml/', $secondPath)) or boolval(preg_match('/\w+\.yaml/', $secondPath))) {
-        $secondFileData = parseYamlFile($secondPath);
-    } else {
-        $secondFileData = [];
-    }
+    $firstFileData = defineFormatAndParseFile($firstPath);
+    $secondFileData = defineFormatAndParseFile($secondPath);
     if ($format === 'stylish') {
         $result = dataMerge($firstFileData, $secondFileData);
-        // var_dump($result);
-        // die;
         return "{" . implode('', defaultFormating($result)) . "\n" . "}";
     } elseif ($format === 'plain') {
         $result = dataMerge($firstFileData, $secondFileData);
