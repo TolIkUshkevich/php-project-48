@@ -11,11 +11,11 @@
             "src/FindDiffFunction.php",
             "src/DataProcessing.php",
             "vendor/phpunit/phpunit/src/Framework/TestCase.php",
-            "parsers/JsonParser.php",
-            "parsers/YamlParser.php",
-            "parsers/parseFile.php",
-            "src/Formaters/stylishFormat.php",
-            "src/Formaters/plainFormat.php"        ]
+            "src/Parsers/JsonParser.php",
+            "src/Parsers/YamlParser.php",
+            "src/Parsers/ParseFile.php",
+            "src/Formaters/StylishFormat.php",
+            "src/Formaters/PlainFormat.php"        ]
     },
     "bin": [
         "bin/gendiff"
