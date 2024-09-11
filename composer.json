@@ -12,8 +12,8 @@
             "src/Parsers/JsonParser.php",
             "src/Parsers/YamlParser.php",
             "src/Parsers/ParseFile.php",
-            "src/Formaters/StylishFormat.php",
-            "src/Formaters/PlainFormat.php"]
+            "src/Formaters/StylishFormating.php",
+            "src/Formaters/PlainFormating.php"]
     },
     "authors": [
         {
