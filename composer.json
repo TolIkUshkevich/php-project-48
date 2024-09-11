@@ -6,14 +6,9 @@
         "bin/gendiff"
     ],
     "autoload": {
-        "psr-4": {
-            "Hexlet\\Code\\": "src/"
-        },
         "files": [
-            "vendor/docopt/docopt/src/docopt.php",
             "src/FindDiffFunction.php",
             "src/DataProcessing.php",
-            "vendor/phpunit/phpunit/src/Framework/TestCase.php",
             "src/Parsers/JsonParser.php",
             "src/Parsers/YamlParser.php",
             "src/Parsers/ParseFile.php",
